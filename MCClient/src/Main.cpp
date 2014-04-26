@@ -33,17 +33,21 @@ int WINAPI WinMain (HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpsz
 	/* Make the window visible on the screen */
 	ShowWindow (hwnd, nCmdShow);
 
-    /**
-     * Ќафиг ваш PeekMessage, с ним больше кода надо писать,
-     * чтоб приложение нормально завершилось после PostQuitMessage
-     */
-	while (GetMessage(&messages, NULL, NULL, NULL))
-	{
-        /* Translate virtual-key messages into character messages */
-        TranslateMessage(&messages);
-        /* Send message to WindowProcedure */
-        DispatchMessageW(&messages);
-	}
+    while (true)
+    {
+        if (PeekMessage(&messages, NULL, NULL, NULL, PM_REMOVE))
+        {
+            /* Translate virtual-key messages into character messages */
+            TranslateMessage(&messages);
+
+            /* Send message to WindowProcedure */
+            DispatchMessageW(&messages);
+
+            /* exit while */
+            if (messages.message == WM_QUIT)
+                break;
+        }
+    }
 
 	/* The program return-value is 0 - The value that PostQuitMessage() gave */
 	return messages.wParam;
