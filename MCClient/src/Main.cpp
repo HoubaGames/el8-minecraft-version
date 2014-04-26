@@ -33,14 +33,14 @@ int WINAPI WinMain (HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpsz
 	/* Make the window visible on the screen */
 	ShowWindow (hwnd, nCmdShow);
 
-	while ()
+	while (true)
 	{
 		if (PeekMessage(&messages, NULL, 0, 0, PM_REMOVE))
 		{
-			/* Translate virtual-key messages into character messages */
-		TranslateMessage(&messages);
-		/* Send message to WindowProcedure */
-		DispatchMessage(&messages);
+				/* Translate virtual-key messages into character messages */
+			TranslateMessage(&messages);
+			/* Send message to WindowProcedure */
+			DispatchMessageW(&messages);
 		}
 
 	}
@@ -59,7 +59,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 		PostQuitMessage (0); /* send a WM_QUIT to the message queue */
 		break;
 	default: /* for messages that we don't deal with */
-		return DefWindowProc (hwnd, message, wParam, lParam);
+		return DefWindowProcW(hwnd, message, wParam, lParam);
 	}
 	return 0;
 }
