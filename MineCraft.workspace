@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Minecraft">
+		<Project filename="MCClient/MCClient.cbp" />
+		<Project filename="MCServer/MCServer.cbp" />
+		<Project filename="MineCraftPSP/MineCraftPSP.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>
