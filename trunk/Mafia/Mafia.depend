@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1425046179 source:f:\projects\mafia\mafia.cpp
+	<iostream>
+	<cstdlib>
+	<ctime>
+
