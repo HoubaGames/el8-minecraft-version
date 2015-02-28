@@ -13,7 +13,7 @@ bool cont;
 //technical parameters
 ProjectGL *pGL;
 GameMenu *pGM;
-uToki *uTK;
+uTime *uTK;
 
 void OnKeyDown(char key)
 {
@@ -28,7 +28,7 @@ void OnKeyUp(char key)
 
 void WaitForEvent()
 {
-    tIma=uTK->GetUtoki();
+    tIma=uTK->GetUtime();
     tCount++;
     while(tIma-temp>1000){
         std::cout<<tCount<<std::endl;
@@ -44,7 +44,7 @@ void WaitForEvent()
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nCmdShow)
 {
     pGL=new ProjectGL;
-    uTK=new uToki;
+    uTK=new uTime;
     pGM=new GameMenu;
 //Set pointers
     pGM->SetProjectGL(pGL);
@@ -58,7 +58,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
     if(!pGL->CreateGLWindow(hInstance))
         return 1;
 
-    tIma=uTK->GetUtoki();
+    tIma=uTK->GetUtime();
     cont=true;
     tCount=0;
     while(cont){

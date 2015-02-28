@@ -2,22 +2,15 @@
 #define UTOKI_H
 
 #include <windows.h>
-#include <iostream>
-#include <fstream>
-extern __inline__ uint64_t rdtsc();
+#include <iostream>//uint64_t
 
-class uToki
+class uTime
 {
 private:
-    uint64_t freq[5];//start time
-    float koefficient;
-//debug variables
-    int SotoFile,KakuMay,MaxStep;
-    std::fstream logfile;
+    uint64_t datai[5];//start time
+    float dataf;
 public:
-    uToki();
-    float GetMtoki();//in milliseconds
-    float GetUtoki();//in milliseconds
-    void DebugHajime(int MaxStep,int KakuMay);
+    uTime();
+    float GetUtime();//in milliseconds
 };
 #endif
