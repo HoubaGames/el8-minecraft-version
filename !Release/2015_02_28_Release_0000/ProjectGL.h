@@ -1,4 +1,3 @@
-
 #ifndef PROJECTGL_H
 #define PROJECTGL_H
 
@@ -6,15 +5,15 @@
 #include <iostream>
 #include <fstream>
 #include <gl\gl.h>			// Заголовочный файл для OpenGL32 библиотеки
-#include <gl\glu.h>			// Заголовочный файл для GLu32 библиотеки
-#include <gl\glaux.h>		// Заголовочный файл для GLaux библиотеки
-#include <gl\glext.h>
+#include <gl\glaux.h>		// Load texture
+//#include <gl\glext.h>
 
 #include "GameMenu.h"
 
-const float WindowDepth=10000;
 const float WindowFogDensity=0.003;
-const float AngleDepth=10240;
+const float WindowDepth=10000;
+const float WindowAngle=1024;
+const float WindowNear=0.1;
 //global pointers to ProjectGL class
 LRESULT CALLBACK NWndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 //delete
@@ -34,6 +33,8 @@ private:
     bool keys[256];//Keyoard
  //window settings
     int WinX,WinY;
+    float InitX,InitY;
+    float WinAsp;
     int WinFlag;
     bool fullscreen;
     void (*FOnKeyDown)(char);
@@ -49,15 +50,26 @@ public:
     bool DeleteGLWindow();
     LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 //set window params
-    void SetScreenSize(int ScreenX,int ScreenY,bool FullScreen=false);
-    void DrawGLScene();
-    void SetGameMenu(GameMenu*);
+    //void SetGameMenu(GameMenu*);
     void SetOnKeyDown(void(*OnKeyPress)(char key));
     void SetOnKeyUp(void(*OnKeyPress)(char key));
-    void SetOnKeyFree(void(*OnKeyUp)(char key));
+    void SetScreenSize(int ScreenX,int ScreenY,bool FullScreen=false);
+//Drawing
+    void EnableMode(char translateKey);
+    void DisableMode();
+    void ClearGLScene();
+    void DrawGLScene(float *vertex,int *face,int facei,int texture=-1,char key=0);/* comment */
+    void ShowGLScene();
 //
-    bool GetKeys(unsigned char key);
     int LoadGLTextures(char* file);
+    bool GetKeys(unsigned char key);
 };
 
+
+/*
+EnableMode
+1 - Scale to window coordinates are -1 to 1 , -1 to 1 , -1
+DrawGLScene: translatekey to:
+2 - to draw by current texture
+*/
 #endif // PROJECTGL_H

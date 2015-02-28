@@ -3,10 +3,12 @@
 #include "utime.h"
 #include "projectgl.h"
 
+int debugfirst;
 ProjectGL *lGL;//this
 
 ProjectGL::ProjectGL()
 {
+    debugfirst=0;
     created=false;
     for(int i=0;i<256;i++)
         keys[i]=false;
@@ -14,6 +16,7 @@ ProjectGL::ProjectGL()
     lGL=this;
 // default window;
     WinY=800;WinX=600;fullscreen=false;
+    WinAsp=4.0/3.0;
     FOnKeyDown=NULL;
     FOnKeyUp=NULL;
     pfd={
@@ -74,6 +77,7 @@ bool ProjectGL::CreateGLWindow(HINSTANCE hI)
                 NULL))){
         MessageBox(NULL,"Can't create window","Error",MB_OK|MB_ICONERROR);
         return false;}
+    created=true;
     DEVMODE dmScreenSettings;			// Режим работы
     memset(&dmScreenSettings,0,sizeof(DEVMODE));	// Очистка для хранения установок
     dmScreenSettings.dmSize=sizeof(DEVMODE);		// Размер структуры Devmode
@@ -84,8 +88,7 @@ bool ProjectGL::CreateGLWindow(HINSTANCE hI)
         ChangeDisplaySettings(&dmScreenSettings,CDS_FULLSCREEN);
     ShowWindow(hWnd,SW_SHOW);
     UpdateWindow(hWnd);
-    SetFocus(hWnd);
-    created=true;//*/
+    SetFocus(hWnd);//*/
     return true;
 }
 
@@ -96,16 +99,11 @@ bool ProjectGL::DeleteGLWindow()
     return true;
 }
 
-//
-void ProjectGL::SetScreenSize(int a,int b,bool c)
+// Set
+/*void ProjectGL::SetGameMenu(GameMenu *arg)
 {
-    WinX=a;
-    WinY=b;
-    fullscreen=c;
-    WinFlag=(c)?(WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS):(WS_EX_APPWINDOW);
-    if(created)
-        ReSizeGLScene();
-}
+    pGM=arg;
+}*/
 
 void ProjectGL::SetOnKeyDown(void(*OnKeyPress)(char key))
 {
@@ -117,23 +115,87 @@ void ProjectGL::SetOnKeyUp(void(*OnKeyPress)(char key))
     FOnKeyUp=OnKeyPress;
 }
 
-void ProjectGL::SetGameMenu(GameMenu *arg)
+void ProjectGL::SetScreenSize(int a,int b,bool c)
 {
-    pGM=arg;
+    WinX=a;
+    WinY=b;// WHY???
+    WinAsp=(float)WinX/(float)WinY;
+    fullscreen=c;
+    WinFlag=(c)?(WS_POPUP|WS_CLIPCHILDREN|WS_CLIPSIBLINGS):(WS_EX_APPWINDOW);
+    if(created)
+        ReSizeGLScene();
+}
+
+void ProjectGL::ReSizeGLScene()
+{
+    InitX=(float)WinX/WindowAngle*WindowNear,InitY=(float)WinY/WindowAngle*WindowNear;
+    glViewport(0,0,WinX, WinY);
+    glMatrixMode(GL_PROJECTION);// Выбор матрицы проекций
+    glLoadIdentity();			// Сброс матрицы проекции
+    glFrustum(-InitX,InitX,-InitY,InitY,WindowNear,WindowDepth);
+    glMatrixMode(GL_MODELVIEW);	// Выбор матрицы просмотра модели
 }
 
 //
-void ProjectGL::DrawGLScene()
+void ProjectGL::ClearGLScene()
 {
-    //pTM->TestUtoki();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);// Очистка экрана и буфера глубины
     glLoadIdentity();				// Сброс просмотра'
-//
+}
 
-//
+void ProjectGL::ShowGLScene()
+{
     glLoadIdentity();				// Сброс просмотра
     SwapBuffers(hDC);
+}
 
+void ProjectGL::EnableMode(char translateKey)
+{
+    glPushMatrix();
+    if(translateKey&1)
+        glScalef(1.0*WinX/WindowAngle,InitY/InitX*WinX/WindowAngle,1);
+}
+
+void ProjectGL::DisableMode()
+{
+    glPopMatrix();
+}
+
+void ProjectGL::DrawGLScene(float *vertex,int *face,int facei,int texture,char translateKey)
+{
+/* translatekey to:
+2 - to draw by current texture
+*/
+    int debugp;
+    glVertexPointer(3,GL_FLOAT,8*sizeof(float),vertex);
+    if((translateKey&2)||(texture>=0)){
+        glTexCoordPointer(2,GL_FLOAT,8*sizeof(float),vertex+3);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        if(!(translateKey&2)){
+            glBindTexture(GL_TEXTURE_2D,TexturaWoLoaded[texture][0]);}}
+    else{
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);}
+    /* Don't delete this code!
+    The code is equals to next line
+    It is need to debug drawing scenes!
+    glColor3f(1,1,1);
+    for(int j=0;j<facei;j++){
+        debugp=face[j];
+        if(j%3==0){
+            if(debugfirst==0)
+                std::cout<<"trg"<<std::endl;
+            glBegin(GL_TRIANGLES);}
+        if(debugfirst==0)
+            std::cout<<vertex[debugp*8+0]<<" "<<vertex[debugp*8+1]<<" "<<vertex[debugp*8+2]<<std::endl;
+        glTexCoord2f(vertex[debugp*8+3],vertex[debugp*8+4]);
+        glVertex3f(vertex[debugp*8+0],vertex[debugp*8+1],vertex[debugp*8+2]);
+        if(j%3==2){
+            if(debugfirst==0)
+                std::cout<<"end"<<std::endl;
+            glEnd();}}
+    //debugfirst++;
+    //*/
+    glDrawElements(GL_TRIANGLES,facei,GL_UNSIGNED_INT,face);
 }
 
 int ProjectGL::LoadGLTextures(char *file)
@@ -150,32 +212,26 @@ int ProjectGL::LoadGLTextures(char *file)
 
 void ProjectGL::InitGL()	// Вызвать после создания окна GL
 {
+    float InitX=WinX/WindowAngle*WindowNear,InitY=WinY/WindowAngle*WindowNear;
     glEnable(GL_TEXTURE_2D);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClearDepth(1.0);		// Разрешить очистку буфера глубины
     glDepthFunc(GL_LESS);	// Тип теста глубины
-    glEnable(GL_DEPTH_TEST);// разрешить тест глубины
+    glDisable(GL_DEPTH_TEST);// разрешить тест глубины
     glShadeModel(GL_SMOOTH);// разрешить плавное цветовое сглаживание
-    glMatrixMode(GL_PROJECTION);// Выбор матрицы проекции
 //
+    glMatrixMode(GL_PROJECTION);// Выбор матрицы проекции
+    glLoadIdentity();		// Сброс матрицы проекции
+    glFrustum(-InitX,InitX,-InitY,InitY,WindowNear,WindowDepth);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glMatrixMode(GL_MODELVIEW);// Выбор матрицы просмотра модел
 //Anti Aliasing
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 //
     glPolygonMode(GL_FRONT,GL_FILL);
     glPolygonMode(GL_BACK,GL_FILL/*LINE*/);
-}
-
-void ProjectGL::ReSizeGLScene()
-{
-    glViewport(0,0,WinX, WinY);
-    glMatrixMode(GL_PROJECTION);// Выбор матрицы проекций
-    glLoadIdentity();			// Сброс матрицы проекции
-    glFrustum(-float(WinX)/AngleDepth,float(WinX)/AngleDepth,-float(WinY)/AngleDepth,float(WinY)/AngleDepth,0.1,WindowDepth);
-    //gluPerspective(45,(GLfloat)x/(GLfloat)y,0.1f,WindowDepth);
-    glMatrixMode(GL_MODELVIEW);	// Выбор матрицы просмотра модели
 }
 
 LRESULT NWndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
@@ -243,6 +299,16 @@ LRESULT ProjectGL::WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
     default:
         return(DefWindowProc(hWnd,message,wParam,lParam));
     }
+    //return after default???
+    /* JUST FOR LOLS FROM http://lurkmore.to/
+    bool value;
+    ...smt;...
+    if (value.ToString().Length == 4){smt}
+    else if (value.ToString().Length == 5){...smt...};
+    else{
+        throw new ArgumentException();
+        return !true && !false;}
+    */
     return(0);
 }
 

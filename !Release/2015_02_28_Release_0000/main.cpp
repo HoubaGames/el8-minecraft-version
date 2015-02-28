@@ -10,16 +10,22 @@ int ScreenX=1024;
 MSG msg;
 bool cont;
 
-//technical parameters
+//Pointers
 ProjectGL *pGL;
 GameMenu *pGM;
 uTime *uTK;
 
 void OnKeyDown(char key)
 {
-    switch(key){
-        case VK_ESCAPE:cont=false;break;
+    if(key==VK_ESCAPE){
+        if(pGM->Escape()==1)
+            cont=false;}else{
+    if((key>='0')&&(key<='9')){
+        pGM->SelectItem(key-'0');}else{
+    if(key==VK_RETURN){
+        pGM->Activate(-1);
     }
+    }}
 }
 
 void OnKeyUp(char key)
@@ -48,22 +54,22 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
     pGM=new GameMenu;
 //Set pointers
     pGM->SetProjectGL(pGL);
-    pGL->SetGameMenu(pGM);
+    pGM->SetMainPointer(&pGM);
+    //pGL->SetGameMenu(pGM);
 //Set parametres
-    pGM->LoadFromFile();
     pGL->SetScreenSize(ScreenX,int(float(ScreenX)/1.414),false);
     pGL->SetOnKeyDown(OnKeyDown);
     pGL->SetOnKeyUp(OnKeyUp);
-
     if(!pGL->CreateGLWindow(hInstance))
         return 1;
-
+    pGM->LoadFromFile();
     tIma=uTK->GetUtime();
     cont=true;
     tCount=0;
+    pGM->Activate();
     while(cont){
         WaitForEvent();
-        pGL->DrawGLScene();}
+        pGM->Draw();}
     pGL->DeleteGLWindow();
     return 0;//*/
 }
