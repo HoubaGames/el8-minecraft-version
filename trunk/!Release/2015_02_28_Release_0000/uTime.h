@@ -1,5 +1,5 @@
-#ifndef UTOKI_H
-#define UTOKI_H
+#ifndef UTIME_H
+#define UTIME_H
 
 #include <windows.h>
 #include <iostream>//uint64_t

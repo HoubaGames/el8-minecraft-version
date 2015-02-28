@@ -38,13 +38,14 @@
 		</Compiler>
 		<Linker>
 			<Add library="opengl32" />
-			<Add library="glu32" />
 			<Add library="glaux" />
 			<Add library="gdi32" />
 			<Add library="winmm" />
 		</Linker>
 		<Unit filename="GameMenu.cpp" />
 		<Unit filename="GameMenu.h" />
+		<Unit filename="Object.cpp" />
+		<Unit filename="Object.h" />
 		<Unit filename="ProjectGL.h" />
 		<Unit filename="Utime.h" />
 		<Unit filename="main.cpp" />
