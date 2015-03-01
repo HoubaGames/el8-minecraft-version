@@ -35,6 +35,7 @@
 			<Add option="-Wextra" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add directory="libs/include" />
 		</Compiler>
 		<Linker>
 			<Add library="opengl32" />

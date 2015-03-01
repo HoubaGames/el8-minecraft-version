@@ -206,8 +206,10 @@ void GameProcess::ApplyBlock(int xx,int yy,int zz,unsigned char type)
     for(int i=0;i<chunks*chunks;i++)
         for(int y=yy;y<256;y+=repeatblock)
             for(int x=xx;x<16;x+=repeatblock)
-                for(int z=zz;z<16;z+=repeatblock){
+                for(int z=zz;z<16;z+=repeatblock)
+				{
                     blocks++;
                     Data[i].Data[z+16*x+256*y]=type;
 
+				}
 }
