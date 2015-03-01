@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <gl\gl.h>			// Заголовочный файл для OpenGL32 библиотеки
-#include <gl\glaux.h>		// Load texture
+#include "glaux.h"		// Load texture
 //#include <gl\glext.h>
 
 const float WindowFogDensity=0.003;
