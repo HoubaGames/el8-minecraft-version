@@ -210,6 +210,4 @@ void GameProcess::ApplyBlock(int xx,int yy,int zz,unsigned char type)
 				{
                     blocks++;
                     Data[i].Data[z+16*x+256*y]=type;}
-
-				}
 }
