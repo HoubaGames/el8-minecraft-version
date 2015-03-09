@@ -30,8 +30,8 @@ GameProcess::GameProcess()
 			pressed[i][j]=0;
 	for(int j=0;j<3;j++)
 		rotation[1][j]=position[1][j]=0;
-	position[0][0]=2.8;position[0][1]=4;position[0][2]=2.8;
-	rotation[0][0]=-45;rotation[0][1]=135;rotation[0][2]=0;
+	position[0][0]=2.8;position[0][1]=-6;position[0][2]=2.8;
+	rotation[0][0]=0;rotation[0][1]=135;rotation[0][2]=0;
 	speed=0;
 }
 
@@ -154,30 +154,21 @@ void GameProcess::SetupDefaultWorld()
 		Texture4[i]=Texture1[i]+0.5;
 		Texture4[i+1]=Texture1[i+1]+0.5;
 	}
-	int step=repeatblock;
-	for(int i=0;i<repeatblock;i++)
-	for(int j=0;j<repeatblock;j++)
-	for(int k=0;k<repeatblock;k++)
-		ApplyBlock(i,j,k,0);
-	blocks=0;
-	for(int i=0;i<repeatblock/2;i++)
-	for(int j=0;j<repeatblock/2;j++)
-		ApplyBlock(i,i+j,j,1);
-	for(int i=repeatblock/2;i<repeatblock;i++)
-	for(int j=0;j<repeatblock/2;j++)
-		ApplyBlock(i,i+j,j,2);
-	for(int i=0;i<repeatblock/2;i++)
-	for(int j=repeatblock/2;j<repeatblock;j++)
-		ApplyBlock(i,i+j,j,3);
-	for(int i=repeatblock/2;i<repeatblock;i++)
-	for(int j=repeatblock/2;j<repeatblock;j++)
-		ApplyBlock(i,i+j,j,4);
+
 	BlockTex[1]=pGL->LoadGLTextures("./data/Textura.bmp");
 	/*BlockTex[1]=pGL->LoadGLTextures("./data/1.bmp");
 	BlockTex[2]=pGL->LoadGLTextures("./data/2.bmp");
 	BlockTex[3]=pGL->LoadGLTextures("./data/3.bmp");
 	BlockTex[4]=pGL->LoadGLTextures("./data/4.bmp");*/
 	Geometry=new Object;
+    ApplyRange(0,0,0, 16*chunks,256,16*chunks,0);//clear space
+    ApplyRange(0,0,0, 16*chunks,1,16*chunks,MN_STONE);//Low level
+    ApplyRange(0,1,4, 1,64,16*chunks-4,MN_DIRT);
+    ApplyRange(4,1,0, 16*chunks-4,64,1,MN_DIRT);
+    ApplyRange(64,4,64, 64,1,64,MN_GRASS);
+    ApplyRange(16*chunks-128,5,16*chunks-128, 64,1,64,MN_SNOW);
+    ApplyRange(0,255,0, 16*chunks,1,16*chunks,MN_STONE);//Low level
+    //ApplyRange(12*16,4,12*16, 32,1,32,MN_SNOW);
 	for(int i=0;i<8*24;i++)
 		Geometry->vertex[i]=tempVert[i];
 	for(int i=0;i<2*24;i++)
@@ -219,14 +210,13 @@ void GameProcess::CompileChunk(int dx,int dy)
 	pGL->ListFinish();
 }
 
-void GameProcess::ApplyBlock(int xx,int yy,int zz,unsigned char type)
+void GameProcess::ApplyRange(int xx,int yy,int zz,int dx,int dy,int dz,unsigned char type)
 {
-	for(int i=0;i<chunks*chunks;i++)
-		for(int y=yy;y<256;y+=repeatblock)
-			for(int x=xx;x<16;x+=repeatblock)
-				for(int z=zz;z<16;z+=repeatblock)
-				{
-					Data[i].Data[z+16*x+256*y]=type;
-					blocks++;
-				}
+    for(int x=xx;x<xx+dx;x++)
+		for(int y=yy;y<yy+dy;y++)
+			for(int z=zz;z<zz+dz;z++)
+			{
+                Data[(x>>4)*chunks+(z>>4)].Data[(z&15)+16*(x&15)+256*(y&255)]=type;
+			}
 }
+
